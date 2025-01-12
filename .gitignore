@@ -11,6 +11,7 @@
 
 # Test file
 *.yaml
+*.list
 *.json
 *.srs
 
@@ -30,3 +31,5 @@
 
 # Go workspace file
 go.work
+
+sing-srs-converter

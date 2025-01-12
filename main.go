@@ -92,7 +92,7 @@ func saveRuleSet(rules []option.DefaultHeadlessRule, outputPath string) error {
 	return nil
 }
 
-func readYamlToRuleset(content []byte, outputPath string) error {
+func readYamlAndListToRuleset(content []byte, outputPath string) error {
 	rawRules, err := getRulesFromContent(content)
 	if err != nil {
 		return err
@@ -364,11 +364,14 @@ func compileRuleSet(sourcePath string) error {
 	var outputPath string
 	if flagConvertOutput == flagConvertDefaultOutput {
 		outputPath = sourcePath
-		if strings.HasSuffix(sourcePath, ".yaml") {
+		switch {
+		case strings.HasSuffix(sourcePath, ".yaml"):
+			outputPath = sourcePath[:len(sourcePath)-5]
+		case strings.HasSuffix(sourcePath, ".list"):
 			outputPath = sourcePath[:len(sourcePath)-5]
 		}
 	} else {
 		outputPath = flagConvertOutput
 	}
-	return readYamlToRuleset(content, outputPath)
+	return readYamlAndListToRuleset(content, outputPath)
 }
