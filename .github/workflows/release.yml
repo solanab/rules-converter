@@ -57,7 +57,7 @@ jobs:
           GOARCH: ${{matrix.jobs.goarch}}
           GOAMD64: ${{matrix.jobs.goamd64}}
           CGO_ENABLED: 0
-        run: go build -v -trimpath -ldflags "-s -w -buildid="
+        run: go build -o sing-rules-converter${{matrix.jobs.suffix}} -v -trimpath -ldflags "-s -w -buildid="
 
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v4.1.0
@@ -73,6 +73,6 @@ jobs:
         uses: svenstaro/upload-release-action@latest
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: sing-rules-converter*
+          file: sing-rules-converter-*
           tag: ${{ github.ref }}
           file_glob: true

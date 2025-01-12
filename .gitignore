@@ -32,4 +32,4 @@
 # Go workspace file
 go.work
 
-sing-srs-converter
+sing-*-converter

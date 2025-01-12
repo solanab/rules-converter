@@ -1,4 +1,4 @@
-module github.com/puernya/sing-srs-converter
+module github.com/solanab/sing-rules-converter
 
 go 1.22.1
 
