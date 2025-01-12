@@ -59,18 +59,16 @@ jobs:
           CGO_ENABLED: 0
         run: |
           go build -o sing-rules-converter${{matrix.jobs.suffix}} -v -trimpath -ldflags "-s -w -buildid="
-          ls -la
 
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v4.1.0
         with:
-          name: rules-converter-${{env.VERSION}}-${{env.GOOS}}-${{matrix.jobs.output}}
-          path: rules-converter${{matrix.jobs.suffix}}
+          name: sing-rules-converter-${{env.VERSION}}-${{env.GOOS}}-${{matrix.jobs.output}}
+          path: sing-rules-converter${{matrix.jobs.suffix}}
           compression-level: 9
 
       - name: Rename binary
         run: |
-          ls -la
           mv sing-rules-converter${{matrix.jobs.suffix}} sing-rules-converter-${{env.VERSION}}-${{env.GOOS}}-${{matrix.jobs.output}}${{matrix.jobs.suffix}}
 
       - name: Upload binaries to release
