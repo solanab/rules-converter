@@ -62,17 +62,17 @@ jobs:
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v4.1.0
         with:
-          name: sing-srs-converter-${{env.VERSION}}-${{env.GOOS}}-${{matrix.jobs.output}}
-          path: sing-srs-converter${{matrix.jobs.suffix}}
+          name: sing-rules-converter-${{env.VERSION}}-${{env.GOOS}}-${{matrix.jobs.output}}
+          path: sing-rules-converter${{matrix.jobs.suffix}}
           compression-level: 9
 
       - name: Rename binary
-        run: mv sing-srs-converter${{matrix.jobs.suffix}} sing-srs-converter-${{env.VERSION}}-${{env.GOOS}}-${{matrix.jobs.output}}${{matrix.jobs.suffix}}
+        run: mv sing-rules-converter${{matrix.jobs.suffix}} sing-rules-converter-${{env.VERSION}}-${{env.GOOS}}-${{matrix.jobs.output}}${{matrix.jobs.suffix}}
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@latest
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: sing-srs-converter*
+          file: sing-rules-converter*
           tag: ${{ github.ref }}
           file_glob: true
