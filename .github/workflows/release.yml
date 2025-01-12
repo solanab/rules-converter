@@ -22,12 +22,18 @@ jobs:
     strategy:
       matrix:
         jobs:
+
           - { goos: linux, goarch: arm64, goamd64: v1, output: arm64, suffix: '' }
           - { goos: linux, goarch: amd64, goamd64: v1, output: x86_64, suffix: '' }
           - { goos: linux, goarch: amd64, goamd64: v3, output: x86_64_v3, suffix: '' }
+
           - { goos: windows, goarch: arm64, goamd64: v1, output: arm64, suffix: '.exe' }
           - { goos: windows, goarch: amd64, goamd64: v1, output: x86_64, suffix: '.exe' }
           - { goos: windows, goarch: amd64, goamd64: v3, output: x86_64_v3, suffix: '.exe' }
+
+          - { goos: darwin, goarch: arm64, goamd64: v1, output: arm64, suffix: '' }
+          - { goos: darwin, goarch: amd64, goamd64: v1, output: x86_64, suffix: '' }
+          - { goos: darwin, goarch: amd64, goamd64: v3, output: x86_64_v3, suffix: '' } 
     env:
       GOOS: ${{matrix.jobs.goos}}
     steps:
@@ -53,7 +59,7 @@ jobs:
           CGO_ENABLED: 0
         run: go build -v -trimpath -ldflags "-s -w -buildid="
 
-      - name: Upload linux amd64 files to Artifacts
+      - name: Upload files to Artifacts
         uses: actions/upload-artifact@v4.1.0
         with:
           name: sing-srs-converter-${{env.VERSION}}-${{env.GOOS}}-${{matrix.jobs.output}}

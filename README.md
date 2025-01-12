@@ -96,3 +96,29 @@ sing-srs-converter rules.yaml -o converted -m
 
 This project is licensed under the MIT License.
 
+## Development
+
+### GitHub Release Process
+
+1. Create a new release in GitHub
+   - Tag format: `v1.0.0` (following semantic versioning)
+   - The release workflow will automatically build and attach binaries for all supported platforms
+
+### Build From Source
+
+```bash
+# Clone the repository
+git clone https://github.com/puernya/sing-srs-converter.git
+
+# Change to project directory
+cd sing-srs-converter
+
+# Build the project
+go build
+```
+
+### Supported Platforms
+
+- Linux (x86_64, x86_64_v3, arm64)
+- Windows (x86_64, x86_64_v3, arm64)
+- macOS (x86_64, x86_64_v3, arm64)
