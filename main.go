@@ -21,9 +21,13 @@ import (
 var (
 	flagMixMode       bool
 	flagConvertOutput string
+	flagVersion       uint8
 )
 
-const flagConvertDefaultOutput = "<file_name>.srs"
+const (
+	flagConvertDefaultOutput = "<file_name>"
+	defaultVersion          = 3
+)
 
 var mainCommand = &cobra.Command{
 	Use:   "sing-srs-converter [source-path]",
@@ -39,7 +43,8 @@ var mainCommand = &cobra.Command{
 
 func init() {
 	mainCommand.Flags().StringVarP(&flagConvertOutput, "output", "o", flagConvertDefaultOutput, "Output file name")
-	mainCommand.Flags().BoolVarP(&flagMixMode, "mix", "m", false, "Output file name")
+	mainCommand.Flags().BoolVarP(&flagMixMode, "mix", "m", false, "Mix mode to combine different rule types")
+	mainCommand.Flags().Uint8VarP(&flagVersion, "version", "v", defaultVersion, "Rule set version (1-3)")
 }
 
 func main() {
@@ -57,15 +62,47 @@ func getRulesFromContent(content []byte) ([]string, error) {
 	if err := yaml.Unmarshal(content, &provider); err == nil {
 		return provider.Rules, nil
 	}
+	
 	var ruleArr []string
 	for _, lineRaw := range strings.Split(string(content), "\n") {
 		line := strings.TrimSpace(lineRaw)
-		if strings.HasPrefix(line, "#") {
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		if !strings.Contains(line, ",") {
 			continue
 		}
 		ruleArr = append(ruleArr, line)
 	}
 	return ruleArr, nil
+}
+
+func saveSourceRuleSet(ruleset *option.PlainRuleSetCompat, outputPath string) error {
+	versionedRuleset := option.PlainRuleSetCompat{
+		Version: flagVersion,
+		Options: ruleset.Options,
+	}
+	
+	buffer := new(bytes.Buffer)
+	encoder := json.NewEncoder(buffer)
+	encoder.SetIndent("", "  ")
+	
+	if err := encoder.Encode(&versionedRuleset); err != nil {
+		return E.Cause(err, "encode config")
+	}
+	
+	output, err := os.Create(outputPath)
+	if err != nil {
+		return E.Cause(err, "open output")
+	}
+	defer output.Close()
+	
+	_, err = output.Write(buffer.Bytes())
+	if err != nil {
+		return E.Cause(err, "write output")
+	}
+	
+	return nil
 }
 
 func saveRuleSet(rules []option.DefaultHeadlessRule, outputPath string) error {
@@ -80,15 +117,15 @@ func saveRuleSet(rules []option.DefaultHeadlessRule, outputPath string) error {
 			}),
 		},
 	}
-	if err := saveSourceRuleSetVersion1(&plainRuleSet, outputPath+"-v2.json"); err != nil {
+
+	if err := saveSourceRuleSet(&plainRuleSet, outputPath+"-v"+strconv.FormatUint(uint64(flagVersion), 10)+".json"); err != nil {
 		return err
 	}
-	if err := saveSourceRuleSetVersion2(&plainRuleSet, outputPath+"-v2.json"); err != nil {
+
+	if err := saveBinaryRuleSet(&plainRuleSet, outputPath+"-v"+strconv.FormatUint(uint64(flagVersion), 10)+".srs"); err != nil {
 		return err
 	}
-	if err := saveBinaryRuleSet(&plainRuleSet, outputPath+".srs"); err != nil {
-		return err
-	}
+
 	return nil
 }
 
@@ -125,7 +162,7 @@ func readYamlAndListToRuleset(content []byte, outputPath string) error {
 				continue
 			}
 			if strings.Contains(ruleContent, "*") {
-				strings.ReplaceAll(ruleContent, "*", "[^\\.]*?")
+				ruleContent = strings.ReplaceAll(ruleContent, "*", "[^\\.]*?")
 				domainRegexArr = append(domainRegexArr, ruleContent[1:])
 				continue
 			}
@@ -283,48 +320,6 @@ func readYamlAndListToRuleset(content []byte, outputPath string) error {
 	return nil
 }
 
-func saveSourceRuleSetVersion1(ruleset *option.PlainRuleSetCompat, outputPath string) error {
-	buffer := new(bytes.Buffer)
-	encoder := json.NewEncoder(buffer)
-	encoder.SetIndent("", "  ")
-	if err := encoder.Encode(ruleset); err != nil {
-		return E.Cause(err, "encode config")
-	}
-	output, err := os.Create(outputPath)
-	if err != nil {
-		return E.Cause(err, "open output")
-	}
-	_, err = output.Write(buffer.Bytes())
-	output.Close()
-	if err != nil {
-		return E.Cause(err, "write output")
-	}
-	return nil
-}
-
-func saveSourceRuleSetVersion2(r *option.PlainRuleSetCompat, outputPath string) error {
-	ruleset := option.PlainRuleSetCompat{
-		Version: 2,
-		Options: r.Options,
-	}
-	buffer := new(bytes.Buffer)
-	encoder := json.NewEncoder(buffer)
-	encoder.SetIndent("", "  ")
-	if err := encoder.Encode(&ruleset); err != nil {
-		return E.Cause(err, "encode config")
-	}
-	output, err := os.Create(outputPath)
-	if err != nil {
-		return E.Cause(err, "open output")
-	}
-	_, err = output.Write(buffer.Bytes())
-	output.Close()
-	if err != nil {
-		return E.Cause(err, "write output")
-	}
-	return nil
-}
-
 func saveBinaryRuleSet(ruleset *option.PlainRuleSetCompat, outputPath string) error {
 	ruleSet, err := ruleset.Upgrade()
 	if err != nil {
@@ -334,7 +329,7 @@ func saveBinaryRuleSet(ruleset *option.PlainRuleSetCompat, outputPath string) er
 	if err != nil {
 		return err
 	}
-	err = srs.Write(outputFile, ruleSet, true)
+	err = srs.Write(outputFile, ruleSet, flagVersion)
 	if err != nil {
 		outputFile.Close()
 		os.Remove(outputPath)

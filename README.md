@@ -52,6 +52,18 @@ IP-CIDR,192.168.1.0/24
 
 Both formats can be used with either .yaml or .list file extensions.
 
+## Version Control
+
+Use `-v` flag to specify the rule set version:
+```bash
+sing-srs-converter rules.yaml -o output -v 2  # Generate version 2 rule set
+```
+
+Supported versions:
+- Version 1: Legacy format
+- Version 2: Current format
+- Version 3: Latest format (default)
+
 ## Output Files
 
 Without mix mode (-m):
