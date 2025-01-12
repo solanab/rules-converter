@@ -30,8 +30,8 @@ const (
 )
 
 var mainCommand = &cobra.Command{
-	Use:   "rules-converter [source-path]",
-	Short: "convert clash rule-provider to sing-box rule-set format",
+	Use:   "sing-rules-converter [source-path]",
+	Short: "convert clash, surge rule-provider to sing-box rule-set format",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		err := compileRuleSet(args[0])

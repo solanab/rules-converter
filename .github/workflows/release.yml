@@ -57,7 +57,9 @@ jobs:
           GOARCH: ${{matrix.jobs.goarch}}
           GOAMD64: ${{matrix.jobs.goamd64}}
           CGO_ENABLED: 0
-        run: go build -o rules-converter${{matrix.jobs.suffix}} -v -trimpath -ldflags "-s -w -buildid="
+        run: |
+          go build -o sing-rules-converter${{matrix.jobs.suffix}} -v -trimpath -ldflags "-s -w -buildid="
+          ls -la
 
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v4.1.0
@@ -67,12 +69,14 @@ jobs:
           compression-level: 9
 
       - name: Rename binary
-        run: mv rules-converter${{matrix.jobs.suffix}} rules-converter-${{env.VERSION}}-${{env.GOOS}}-${{matrix.jobs.output}}${{matrix.jobs.suffix}}
+        run: |
+          ls -la
+          mv sing-rules-converter${{matrix.jobs.suffix}} sing-rules-converter-${{env.VERSION}}-${{env.GOOS}}-${{matrix.jobs.output}}${{matrix.jobs.suffix}}
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@latest
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: rules-converter-*
+          file: sing-rules-converter-*
           tag: ${{ github.ref }}
           file_glob: true
