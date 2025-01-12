@@ -1,11 +1,15 @@
-# sing-srs-converter
+# sing-rules-converter
 
-A Go-based tool to convert Clash rule provider files to sing-box rule-set format.
+A Go-based tool to convert various rule provider files (Clash/Surge/Shadowrocket) to sing-box rule-set format.
 
 ## Features
 
-- Converts Clash rule provider YAML files to sing-box rule-set format
-- Supports both source type (.json) and binary type (.srs) rule-sets
+- Converts various rule formats to sing-box rule-set format:
+  - Clash YAML rule provider files
+  - Surge/Shadowrocket LIST format rules
+- Outputs in both formats:
+  - Source type (.json)
+  - Binary type (.srs)
 - Supports various rule types:
   - Domain rules (DOMAIN, DOMAIN-SUFFIX, DOMAIN-KEYWORD, DOMAIN-REGEX)
   - IP rules (IP-CIDR, IP-CIDR6, SRC-IP-CIDR)
@@ -16,23 +20,25 @@ A Go-based tool to convert Clash rule provider files to sing-box rule-set format
 ## Installation
 
 ```bash
-go install github.com/puernya/sing-srs-converter@latest
+go install github.com/solanab/sing-rules-converter@latest
 ```
 
 ## Usage
 
 Basic usage:
 ```bash
-sing-srs-converter [source-path]
+sing-rules-converter [source-path]
 ```
 
 Options:
 ```bash
 Flags:
-  -h, --help            help for sing-srs-converter
+  -h, --help            help for sing-rules-converter
   -m, --mix            Enable mix mode to combine different rule types
-  -o, --output string  Output file name (default "<file_name>.srs")
+  -o, --output string  Output file name (default "<file_name>")
+  -v, --version uint8  Rule set version (1-3) (default 3)
 ```
+
 ## Supported Formats
 
 The converter supports two input formats:
@@ -56,7 +62,7 @@ Both formats can be used with either .yaml or .list file extensions.
 
 Use `-v` flag to specify the rule set version:
 ```bash
-sing-srs-converter rules.yaml -o output -v 2  # Generate version 2 rule set
+sing-rules-converter rules.yaml -o output -v 2  # Generate version 2 rule set
 ```
 
 Supported versions:
@@ -84,12 +90,12 @@ With mix mode (-m):
 
 Convert a Clash rule provider file:
 ```bash
-sing-srs-converter rules.yaml -o converted
+sing-rules-converter rules.yaml -o converted
 ```
 
 Convert and combine all rules into single files:
 ```bash
-sing-srs-converter rules.yaml -o converted -m
+sing-rules-converter rules.yaml -o converted -m
 ```
 
 ## License
@@ -108,10 +114,10 @@ This project is licensed under the MIT License.
 
 ```bash
 # Clone the repository
-git clone https://github.com/puernya/sing-srs-converter.git
+git clone https://github.com/puernya/sing-rules-converter.git
 
 # Change to project directory
-cd sing-srs-converter
+cd sing-rules-converter
 
 # Build the project
 go build
