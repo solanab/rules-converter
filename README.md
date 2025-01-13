@@ -102,6 +102,10 @@ sing-rules-converter rules.yaml -o converted -m
 
 This project is licensed under the MIT License.
 
+## References
+
+- [sing-box Rule Set Source Format Documentation](https://sing-box.sagernet.org/configuration/rule-set/source-format/)
+
 ## Development
 
 ### GitHub Release Process
