@@ -214,7 +214,7 @@ func readYamlAndListToRuleset(content []byte, outputPath string) error {
 					Invert:        true,
 				})
 			}
-			if err := saveRuleSet(domainRuleArr, outputPath+"-domain"); err != nil {
+			if err := saveRuleSet(domainRuleArr, outputPath+"-site"); err != nil {
 				return err
 			}
 			rules = append(rules, domainRuleArr...)
