@@ -312,7 +312,7 @@ func readYamlAndListToRuleset(content []byte, outputPath string) error {
 		rules = append(rules, rule)
 	}
 	if len(rules) == 0 {
-		return E.New("empty input")
+		return E.Cause(E.New("empty input"), "no valid rules found in file: "+outputPath)
 	}
 	if flagMixMode {
 		return saveRuleSet(rules, outputPath)
@@ -347,15 +347,22 @@ func compileRuleSet(sourcePath string) error {
 	if sourcePath == "stdin" {
 		reader = os.Stdin
 	} else {
-		reader, err = os.Open(sourcePath)
+		file, err := os.Open(sourcePath)
 		if err != nil {
-			return err
+			return E.Cause(err, "failed to open source file: "+sourcePath)
 		}
+		defer file.Close()
+		reader = file
 	}
+	
 	content, err := io.ReadAll(reader)
 	if err != nil {
-		return err
+		return E.Cause(err, "failed to read content from: "+sourcePath)
 	}
+	if len(content) == 0 {
+		return E.Cause(E.New("empty input"), "file is empty: "+sourcePath)
+	}
+	
 	var outputPath string
 	if flagConvertOutput == flagConvertDefaultOutput {
 		outputPath = sourcePath
